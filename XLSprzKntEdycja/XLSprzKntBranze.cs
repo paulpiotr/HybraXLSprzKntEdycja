@@ -65,21 +65,21 @@ namespace XLSprzKntEdycja
             //text_deb.Bounds = new Rectangle(620, 40, 300, 200);
 
             text_SLW_ID = tab3.AllChildren.Add(ControlTypes.text);
-            text_SLW_ID.Visible = true;
+            text_SLW_ID.Visible = false;
             text_SLW_ID.Bounds = new Rectangle(20, 40, 40, 15);
 
             text_ElBranOpisID = tab3.AllChildren.Add(ControlTypes.text);
-            text_ElBranOpisID.Visible = true;
+            text_ElBranOpisID.Visible = false;
             text_ElBranOpisID.Bounds = new Rectangle(70, 40, 40, 15);
 
             text_opis = tab3.AllChildren.Add(ControlTypes.text);
             text_opis.Visible = true;
-            text_opis.Bounds = new Rectangle(120, 40, 400, 30);
+            text_opis.Bounds = new Rectangle(20, 40, 490, 35);
 
             button_save = tab3.AllChildren.Add(ControlTypes.button);
             button_save.Visible = true;
-            button_save.Bounds = new Rectangle(530, 40, 70, 15);
-            button_save.TextRaw = "Zapisz";
+            button_save.Bounds = new Rectangle(520, 40,80, 15);
+            button_save.TextRaw = "Zapisz branże";
 
             dropcombo = tab3.AllChildren.Add(ControlTypes.dropcombo);
             dropcombo.Visible = true;
@@ -120,9 +120,9 @@ namespace XLSprzKntEdycja
 
         private bool OnOpenWindow(Procedures ProcID, int ControlID, Events Event)
         {
-            AddSubscription(false, button_search.Id, Events.Accepted, new TakeEventDelegate(WyszukajBranze));
-            AddSubscription(false, button_save.Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));
-            AddSubscription(false, button_load.Id, Events.Accepted, new TakeEventDelegate(WczytajWszystkieBranze));
+            AddSubscription(true, button_search.Id, Events.Accepted, new TakeEventDelegate(WyszukajBranze));
+            AddSubscription(true, button_save.Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));
+            AddSubscription(true, button_load.Id, Events.Accepted, new TakeEventDelegate(WczytajWszystkieBranze));
             AddSubscription(true, GetWindow().Children["?Cli_Zapisz"].Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));
             UstawBranze(ProcID, ControlID, Event);
             return (true);
