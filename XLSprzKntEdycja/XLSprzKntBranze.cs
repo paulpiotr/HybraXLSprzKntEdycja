@@ -78,26 +78,26 @@ namespace XLSprzKntEdycja
 
             button_save = tab3.AllChildren.Add(ControlTypes.button);
             button_save.Visible = true;
-            button_save.Bounds = new Rectangle(530, 40, 60, 15);
+            button_save.Bounds = new Rectangle(530, 40, 70, 15);
             button_save.TextRaw = "Zapisz";
 
             dropcombo = tab3.AllChildren.Add(ControlTypes.dropcombo);
             dropcombo.Visible = true;
-            dropcombo.Bounds = new Rectangle(20, 80, 430, 15);
+            dropcombo.Bounds = new Rectangle(20, 80, 420, 15);
 
             button_search = tab3.AllChildren.Add(ControlTypes.button);
             button_search.Visible = true;
-            button_search.Bounds = new Rectangle(460, 80, 60, 15);
+            button_search.Bounds = new Rectangle(450, 80, 60, 15);
             button_search.TextRaw = "Wyszukaj";
 
             button_load = tab3.AllChildren.Add(ControlTypes.button);
             button_load.Visible = true;
-            button_load.Bounds = new Rectangle(530, 80, 60, 15);
+            button_load.Bounds = new Rectangle(520, 80, 80, 15);
             button_load.TextRaw = "Wczytaj wszystkie";
 
             list = tab3.AllChildren.Add(ControlTypes.list);
             list.Visible = true;
-            list.Bounds = new Rectangle(20, 100, 570, 250);
+            list.Bounds = new Rectangle(20, 100, 580, 260);
 
             ListFromRaw(null);
             list.OnAfterAccepted += List_OnAfterAccepted;
@@ -161,6 +161,7 @@ namespace XLSprzKntEdycja
                 return false;
             }
         }
+
         private bool SprawdzUstawionaBranza(Procedures ProcID, int ControlID, Events Event)
         {
             try
@@ -203,6 +204,7 @@ namespace XLSprzKntEdycja
         {
             try
             {
+                dropcombo.ScreenTextRaw = " ";
                 return ListFromRaw(null, 0);
             }
             catch (Exception e)
@@ -246,10 +248,11 @@ namespace XLSprzKntEdycja
             catch (Exception e)
             {
                 //MessageBox.Show("Proszę wybrać branżę dla kontrahenta z listy!", "Brak wyboru branży kontrahenta", MessageBoxButtons.OK, MessageBoxIcon.Stop);
-                MessageBox.Show("Proszę wybrać branżę w zakładce Branże Kontrahentów! Należy wybrać branżę z listy i kliknć zapisz." + "\n" + e.Message.ToString(), "Blokada zapisu kartoteki (Branże Kontrahentów)", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                MessageBox.Show("Proszę wybrać branżę w zakładce Branże Kontrahentów! Należy wybrać branżę z listy i kliknć zapisz.", "Blokada zapisu kartoteki (Branże Kontrahentów)", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
         }
+
         private bool WyszukajBranze(Procedures ProcID, int ControlID, Events Event)
         {
             try
@@ -300,11 +303,12 @@ namespace XLSprzKntEdycja
                 return false;
             }
         }
+
         private bool ListFromRaw(string text = null, Int32 i = 0)
         {
             try
             {
-                bool fillUpDropcombo = DropcomboFromRaw();
+                bool dropcomboFromRaw = DropcomboFromRaw();
                 string sql = "" +
                     "SELECT b.slw_id [SLW_ID], b.SLW_WartoscS [Nazwa], bo.ElBranOpisID [ElBranOpisID], bo.Opis [Opis] FROM CDN.el_CRMBranzeOpisy bo " +
                     "RIGHT JOIN ( " +
