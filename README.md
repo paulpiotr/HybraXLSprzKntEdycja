@@ -1,2 +1,2 @@
-# Hybra XL Sprzedaż KntEdycja - Dodatkowa zakładka na karcie kontrahenta
+# Hydra XL Sprzedaż KntEdycja - Dodatkowa zakładka na karcie kontrahenta
 Zakładka Branże na karcie kontrahentów
