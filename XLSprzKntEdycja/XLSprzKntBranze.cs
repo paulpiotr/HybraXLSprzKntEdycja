@@ -57,10 +57,6 @@ namespace XLSprzKntEdycja
             tab3.TextRaw = "Wybór branży";
             tab3.Bounds = new Rectangle(10, 40, 600, 350);
 
-            //text_deb = tab3.AllChildren.Add(ControlTypes.text);
-            //text_deb.Visible = true;
-            //text_deb.Bounds = new Rectangle(620, 40, 300, 200);
-
             text_SLW_ID = tab3.AllChildren.Add(ControlTypes.text);
             text_SLW_ID.Visible = false;
             text_SLW_ID.Bounds = new Rectangle(20, 40, 40, 15);
