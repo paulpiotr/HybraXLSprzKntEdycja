@@ -30,11 +30,7 @@ namespace XLSprzKntEdycja
         ClaWindow tab, tab2, tab3;
         ClaWindow button_search, button_load, button_save, button_add, button_remove;
         ClaWindow dropcombo, list;
-        ClaWindow text_SLW_ID, text_ElBranOpisID, text_opis, text_deb;
-        /*private string connetionString { get; set; }
-        private SqlConnection sqlConnection { get; set; }
-        private SqlCommand sqlCommand { get; set; }
-        private SqlDataReader dataReader { get; set; }*/
+        ClaWindow text_SLW_ID, text_ElBranOpisID, text_opis;
 
         public override void Init()
         {
