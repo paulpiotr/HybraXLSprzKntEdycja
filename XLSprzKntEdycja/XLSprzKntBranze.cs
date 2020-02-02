@@ -35,6 +35,7 @@ namespace XLSprzKntEdycja
         private SqlConnection sqlConnection { get; set; }
         private SqlCommand sqlCommand { get; set; }
         private SqlDataReader dataReader { get; set; }*/
+
         public override void Init()
         {
             AddSubscription(true, 0, Events.JustAfterWindowOpening, new TakeEventDelegate(JustAfterWindowOpening));
@@ -144,7 +145,6 @@ namespace XLSprzKntEdycja
         {
             try
             {
-
                 var result = MessageBox.Show(
                     "Usunć " + text_opis.TextRaw.ToString() + " id: " + text_ElBranOpisID.TextRaw.ToString(),
                     "Usuwanie Opisu",
@@ -200,6 +200,7 @@ namespace XLSprzKntEdycja
                 return false;
             }
         }
+
         private bool UstawBranze(Procedures ProcID, int ControlID, Events Event)
         {
             try
@@ -379,11 +380,11 @@ namespace XLSprzKntEdycja
             {
                 bool dropcomboFromRaw = DropcomboFromRaw();
                 string sql = "" +
-                        "SELECT s.SLW_ID [SLW_ID], s.SLW_WartoscS [Nazwa], o.ElBranOpisID [ElBranOpisID], COALESCE(o.Opis, 'Brak danych')[Opis] "+
-                        "FROM [CDN].[el_CRMBranzeOpisy] o "+
+                        "SELECT s.SLW_ID [SLW_ID], s.SLW_WartoscS [Nazwa], o.ElBranOpisID [ElBranOpisID], COALESCE(o.Opis, 'Brak danych')[Opis] " +
+                        "FROM [CDN].[el_CRMBranzeOpisy] o " +
                         "RIGHT JOIN( " +
-                            "SELECT * FROM[CDN].[Slowniki] s "+
-                            "WHERE s.SLW_Kategoria = 'Branże kontrahentów' AND s.SLW_Aktywny = 1 AND s.SLW_Predefiniowany = 0"+
+                            "SELECT * FROM[CDN].[Slowniki] s " +
+                            "WHERE s.SLW_Kategoria = 'Branże kontrahentów' AND s.SLW_Aktywny = 1 AND s.SLW_Predefiniowany = 0" +
                         ") s ON s.SLW_ID = o.branzaID" +
                         "";
                 if (null != text)
