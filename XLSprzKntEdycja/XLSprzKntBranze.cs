@@ -1,11 +1,11 @@
 ﻿using System;
+using Hydra;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
-using Hydra;
 using System.Data.SqlClient;
 using System.Collections;
 using System.ComponentModel;
@@ -28,7 +28,7 @@ namespace XLSprzKntEdycja
         ClaWindow parent;
         ClaWindow sheet;
         ClaWindow tab, tab2, tab3;
-        ClaWindow button_search, button_load, button_save;
+        ClaWindow button_search, button_load, button_save, button_add, button_remove;
         ClaWindow dropcombo, list;
         ClaWindow text_SLW_ID, text_ElBranOpisID, text_opis, text_deb;
         /*private string connetionString { get; set; }
@@ -78,8 +78,18 @@ namespace XLSprzKntEdycja
 
             button_save = tab3.AllChildren.Add(ControlTypes.button);
             button_save.Visible = true;
-            button_save.Bounds = new Rectangle(520, 40,80, 15);
+            button_save.Bounds = new Rectangle(520, 40, 80, 15);
             button_save.TextRaw = "Zapisz branże";
+
+            button_add = tab3.AllChildren.Add(ControlTypes.button);
+            button_add.Visible = true;
+            button_add.Bounds = new Rectangle(520, 60, 40, 15);
+            button_add.TextRaw = "Dodaj";
+
+            button_remove = tab3.AllChildren.Add(ControlTypes.button);
+            button_remove.Visible = true;
+            button_remove.Bounds = new Rectangle(560, 60, 40, 15);
+            button_remove.TextRaw = "Usuń";
 
             dropcombo = tab3.AllChildren.Add(ControlTypes.dropcombo);
             dropcombo.Visible = true;
@@ -123,11 +133,73 @@ namespace XLSprzKntEdycja
             AddSubscription(true, button_search.Id, Events.Accepted, new TakeEventDelegate(WyszukajBranze));
             AddSubscription(true, button_save.Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));
             AddSubscription(true, button_load.Id, Events.Accepted, new TakeEventDelegate(WczytajWszystkieBranze));
+            AddSubscription(true, button_add.Id, Events.Accepted, new TakeEventDelegate(DodajOpis));
+            AddSubscription(true, button_remove.Id, Events.Accepted, new TakeEventDelegate(UsunOpis));
             AddSubscription(true, GetWindow().Children["?Cli_Zapisz"].Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));
             UstawBranze(ProcID, ControlID, Event);
             return (true);
         }
 
+        private bool UsunOpis(Procedures ProcID, int ControlID, Events Event)
+        {
+            try
+            {
+
+                var result = MessageBox.Show(
+                    "Usunć " + text_opis.TextRaw.ToString() + " id: " + text_ElBranOpisID.TextRaw.ToString(),
+                    "Usuwanie Opisu",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    string sql = "" +
+                        "DELETE FROM" +
+                        "\n" +
+                        "[CDN].[el_CRMBranzeOpisy]" +
+                        "\n" +
+                        "WHERE ElBranOpisID=" + Int32.Parse(text_ElBranOpisID.TextRaw.ToString());
+                    string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
+                    SqlConnection sqlConnection = new SqlConnection(connetionString);
+                    SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
+                    sqlCommand.Connection.Open();
+                    sqlCommand.ExecuteNonQuery();
+                    sqlCommand.Connection.Close();
+                }
+                return WyszukajBranze(ProcID, ControlID, Event);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Błąd: " + e.Message + "\n" + e.StackTrace);
+                return false;
+            }
+        }
+
+        private bool DodajOpis(Procedures ProcID, int ControlID, Events Event)
+        {
+            try
+            {
+                string sql = "" +
+                    "INSERT INTO" +
+                    "\n" +
+                    "[CDN].[el_CRMBranzeOpisy]" +
+                    "\n" +
+                    "(branzaID, Opis)" +
+                    "\n" +
+                    "VALUES(" + Int32.Parse(text_SLW_ID.TextRaw.ToString()) + ", '" + text_opis.TextRaw.ToString() + "')";
+                string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
+                SqlConnection sqlConnection = new SqlConnection(connetionString);
+                SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
+                sqlCommand.Connection.Open();
+                sqlCommand.ExecuteNonQuery();
+                sqlCommand.Connection.Close();
+                return WyszukajBranze(ProcID, ControlID, Event);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Błąd: " + e.Message + "\n" + e.StackTrace);
+                return false;
+            }
+        }
         private bool UstawBranze(Procedures ProcID, int ControlID, Events Event)
         {
             try
@@ -271,12 +343,9 @@ namespace XLSprzKntEdycja
             try
             {
                 string sql = "" +
-                        "SELECT b.slw_id [SLW_ID], b.SLW_WartoscS [Nazwa], bo.ElBranOpisID [ElBranOpisID], bo.Opis [Opis] FROM CDN.el_CRMBranzeOpisy bo " +
-                            "RIGHT JOIN ( " +
-                                "SELECT SLW_ID, SLW_WartoscS FROM CDN.slowniki " +
-                                "WHERE SLW_Kategoria='Branże kontrahentów' and SLW_Aktywny = 1 and SLW_Predefiniowany = 0 " +
-                            ") b on bo.branzaID = b.SLW_ID ";
-                sql += " ORDER BY b.slw_id, b.SLW_WartoscS, bo.ElBranOpisID ";
+                        "SELECT s.slw_id [SLW_ID], s.SLW_WartoscS [Nazwa] FROM [CDN].[Slowniki] s " +
+                        "WHERE s.SLW_Kategoria='Branże kontrahentów' AND s.SLW_Aktywny = 1 AND s.SLW_Predefiniowany = 0 " +
+                        "ORDER BY s.SLW_ID, s.SLW_WartoscS";
                 string dropcomboItems = "";
                 Int32 k = 0;
                 string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
@@ -310,16 +379,18 @@ namespace XLSprzKntEdycja
             {
                 bool dropcomboFromRaw = DropcomboFromRaw();
                 string sql = "" +
-                    "SELECT b.slw_id [SLW_ID], b.SLW_WartoscS [Nazwa], bo.ElBranOpisID [ElBranOpisID], bo.Opis [Opis] FROM CDN.el_CRMBranzeOpisy bo " +
-                    "RIGHT JOIN ( " +
-                        "SELECT SLW_ID, SLW_WartoscS FROM CDN.slowniki " +
-                        "WHERE SLW_Kategoria='Branże kontrahentów' and SLW_Aktywny = 1 and SLW_Predefiniowany = 0 " +
-                    ") b on bo.branzaID = b.SLW_ID ";
+                        "SELECT s.SLW_ID [SLW_ID], s.SLW_WartoscS [Nazwa], o.ElBranOpisID [ElBranOpisID], COALESCE(o.Opis, 'Brak danych')[Opis] "+
+                        "FROM [CDN].[el_CRMBranzeOpisy] o "+
+                        "RIGHT JOIN( " +
+                            "SELECT * FROM[CDN].[Slowniki] s "+
+                            "WHERE s.SLW_Kategoria = 'Branże kontrahentów' AND s.SLW_Aktywny = 1 AND s.SLW_Predefiniowany = 0"+
+                        ") s ON s.SLW_ID = o.branzaID" +
+                        "";
                 if (null != text)
                 {
-                    sql += " WHERE b.SLW_WartoscS LIKE '%" + text.ToString() + "%' OR bo.Opis LIKE '%" + text.ToString() + "%' ";
+                    sql += " WHERE s.SLW_WartoscS LIKE '%" + text.ToString() + "%' OR o.Opis LIKE '%" + text.ToString() + "%' ";
                 }
-                sql += " ORDER BY b.slw_id, b.SLW_WartoscS, bo.ElBranOpisID ";
+                sql += " ORDER BY s.SLW_ID, s.SLW_WartoscS, o.ElBranOpisID ";
                 string listaItems = "";
                 Int32 j = 0;
                 Int32 k = 0;
