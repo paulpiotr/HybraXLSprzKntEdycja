@@ -73,6 +73,7 @@ namespace XLSprzKntEdycja
             text_opis = tab3.AllChildren.Add(ControlTypes.text);
             text_opis.Visible = true;
             text_opis.Bounds = new Rectangle(70, 40, 530, 15);
+            text_opis.ReadOnlyRaw = "1";
 
             /*button_save = tab3.AllChildren.Add(ControlTypes.button);
             button_save.Visible = true;
