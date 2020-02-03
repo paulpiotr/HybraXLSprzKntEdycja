@@ -29,7 +29,7 @@ namespace XLSprzKntEdycja
         ClaWindow sheet;
         ClaWindow tab, tab2, tab3;
         ClaWindow button_search, button_load, button_save, button_add, button_remove;
-        ClaWindow dropcombo, list;
+        ClaWindow dropcombo, list, item;
         ClaWindow text_SLW_ID, text_ElBranOpisID, text_opis;
 
         public override void Init()
@@ -65,11 +65,16 @@ namespace XLSprzKntEdycja
             text_ElBranOpisID.Visible = false;
             text_ElBranOpisID.Bounds = new Rectangle(70, 40, 40, 15);
 
+            item = tab3.AllChildren.Add(ControlTypes.stringcontrol);
+            item.Visible = true;
+            item.Bounds = new Rectangle(20, 40, 45, 15);
+            item.TextRaw = " Branża: ";
+
             text_opis = tab3.AllChildren.Add(ControlTypes.text);
             text_opis.Visible = true;
-            text_opis.Bounds = new Rectangle(20, 40, 490, 35);
+            text_opis.Bounds = new Rectangle(70, 40, 530, 15);
 
-            button_save = tab3.AllChildren.Add(ControlTypes.button);
+            /*button_save = tab3.AllChildren.Add(ControlTypes.button);
             button_save.Visible = true;
             button_save.Bounds = new Rectangle(520, 40, 80, 15);
             button_save.TextRaw = "Zapisz branże";
@@ -82,25 +87,30 @@ namespace XLSprzKntEdycja
             button_remove = tab3.AllChildren.Add(ControlTypes.button);
             button_remove.Visible = true;
             button_remove.Bounds = new Rectangle(560, 60, 40, 15);
-            button_remove.TextRaw = "Usuń";
+            button_remove.TextRaw = "Usuń";*/
+
+            item = tab3.AllChildren.Add(ControlTypes.stringcontrol);
+            item.Visible = true;
+            item.Bounds = new Rectangle(20, 60, 45, 15);
+            item.TextRaw = " Filtr: ";
 
             dropcombo = tab3.AllChildren.Add(ControlTypes.dropcombo);
             dropcombo.Visible = true;
-            dropcombo.Bounds = new Rectangle(20, 80, 420, 15);
+            dropcombo.Bounds = new Rectangle(70, 60, 370, 15);
 
             button_search = tab3.AllChildren.Add(ControlTypes.button);
             button_search.Visible = true;
-            button_search.Bounds = new Rectangle(450, 80, 60, 15);
+            button_search.Bounds = new Rectangle(450, 60, 60, 15);
             button_search.TextRaw = "Wyszukaj";
 
             button_load = tab3.AllChildren.Add(ControlTypes.button);
             button_load.Visible = true;
-            button_load.Bounds = new Rectangle(520, 80, 80, 15);
-            button_load.TextRaw = "Wczytaj wszystkie";
+            button_load.Bounds = new Rectangle(520, 60, 80, 15);
+            button_load.TextRaw = "Wyczyść filtr";
 
             list = tab3.AllChildren.Add(ControlTypes.list);
             list.Visible = true;
-            list.Bounds = new Rectangle(20, 100, 580, 260);
+            list.Bounds = new Rectangle(20, 80, 580, 280);
 
             ListFromRaw(null);
             list.OnAfterAccepted += List_OnAfterAccepted;
@@ -124,10 +134,10 @@ namespace XLSprzKntEdycja
         private bool OnOpenWindow(Procedures ProcID, int ControlID, Events Event)
         {
             AddSubscription(true, button_search.Id, Events.Accepted, new TakeEventDelegate(WyszukajBranze));
-            AddSubscription(true, button_save.Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));
+            /*AddSubscription(true, button_save.Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));*/
             AddSubscription(true, button_load.Id, Events.Accepted, new TakeEventDelegate(WczytajWszystkieBranze));
-            AddSubscription(true, button_add.Id, Events.Accepted, new TakeEventDelegate(DodajOpis));
-            AddSubscription(true, button_remove.Id, Events.Accepted, new TakeEventDelegate(UsunOpis));
+            /*AddSubscription(true, button_add.Id, Events.Accepted, new TakeEventDelegate(DodajOpis));
+            AddSubscription(true, button_remove.Id, Events.Accepted, new TakeEventDelegate(UsunOpis));*/
             AddSubscription(true, GetWindow().Children["?Cli_Zapisz"].Id, Events.Accepted, new TakeEventDelegate(ZapiszBranze));
             UstawBranze(ProcID, ControlID, Event);
             return (true);
@@ -199,7 +209,7 @@ namespace XLSprzKntEdycja
             {
                 Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
                 string sql = "" +
-                    "SELECT TOP 1 * FROM [CDN].[el_CRMBranzeOpisy_KntKarty] eck " +
+                    "SELECT TOP 1 * FROM [CDN].[ISK_el_CRMBranzeOpisy_KntKarty] eck " +
                     "INNER JOIN CDN.el_CRMBranzeOpisy ec ON " +
                     "ec.ElBranOpisID = eck.el_CRMBranzeOpisy_ElBranOpisID " +
                     "INNER JOIN CDN.Slowniki sl ON " +
@@ -214,7 +224,7 @@ namespace XLSprzKntEdycja
                 {
                     text_SLW_ID.TextRaw = dataReader["SLW_ID"].ToString();
                     text_ElBranOpisID.TextRaw = dataReader["ElBranOpisID"].ToString();
-                    text_opis.TextRaw = dataReader["SLW_WartoscS"].ToString() + " / " + dataReader["Opis"].ToString();
+                    text_opis.TextRaw = dataReader["SLW_WartoscS"].ToString()/* + " / " + dataReader["Opis"].ToString()*/;
                 }
                 dataReader.Close();
                 sqlCommand.Connection.Close();
@@ -240,7 +250,7 @@ namespace XLSprzKntEdycja
                 else
                 {
                     Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
-                    string sql = "SELECT TOP 1 Knt_Karty_GIDNumer FROM [CDN].[el_CRMBranzeOpisy_KntKarty] WHERE Knt_Karty_GIDNumer = " + Knt_GIDNumer;
+                    string sql = "SELECT TOP 1 Knt_Karty_GIDNumer FROM [CDN].[ISK_el_CRMBranzeOpisy_KntKarty] WHERE Knt_Karty_GIDNumer = " + Knt_GIDNumer;
                     string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
                     SqlConnection sqlConnection = new SqlConnection(connetionString);
                     SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
@@ -287,9 +297,9 @@ namespace XLSprzKntEdycja
                 Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
                 Int32 ElBranOpisID = Int32.Parse(text_ElBranOpisID.TextRaw.ToString());
                 string sql = "" +
-                    "IF EXISTS (SELECT Knt_Karty_GIDNumer FROM [CDN].[el_CRMBranzeOpisy_KntKarty] WHERE Knt_Karty_GIDNumer=" + Knt_GIDNumer + ")" +
+                    "IF EXISTS (SELECT Knt_Karty_GIDNumer FROM [CDN].[ISK_el_CRMBranzeOpisy_KntKarty] WHERE Knt_Karty_GIDNumer=" + Knt_GIDNumer + ")" +
                     "\n" +
-                    "UPDATE [CDN].[el_CRMBranzeOpisy_KntKarty] SET " +
+                    "UPDATE [CDN].[ISK_el_CRMBranzeOpisy_KntKarty] SET " +
                         "Knt_Karty_GIDNumer=" + Knt_GIDNumer + ",el_CRMBranzeOpisy_ElBranOpisID=" + ElBranOpisID + " " +
                     "WHERE Knt_Karty_GIDNumer=" + Knt_GIDNumer +
                     "\n" +
@@ -297,7 +307,7 @@ namespace XLSprzKntEdycja
                     "\n" +
                     "INSERT INTO" +
                     "\n" +
-                    "[CDN].[el_CRMBranzeOpisy_KntKarty]" +
+                    "[CDN].[ISK_el_CRMBranzeOpisy_KntKarty]" +
                     "\n" +
                     "(Knt_Karty_GIDNumer, el_CRMBranzeOpisy_ElBranOpisID)" +
                     "\n" +
@@ -397,23 +407,24 @@ namespace XLSprzKntEdycja
                     j++;
                     if (k == Int32.Parse(dataReader["SLW_ID"].ToString()))
                     {
-                        listaItems = listaItems + " | |" + dataReader["Opis"].ToString() + "|";
+                        listaItems = listaItems + " |" + dataReader["Opis"].ToString() + "|";
                     }
                     else
                     {
-                        listaItems = listaItems + dataReader["SLW_ID"].ToString() + "|" + dataReader["Nazwa"].ToString() + "|" + dataReader["Opis"].ToString() + "|";
+                        listaItems = listaItems + /*dataReader["SLW_ID"].ToString() + "|" + */dataReader["Nazwa"].ToString() + "|" + dataReader["Opis"].ToString() + "|";
                     }
                     k = Int32.Parse(dataReader["SLW_ID"].ToString());
                     if (i > 0 && j == i)
                     {
                         text_SLW_ID.TextRaw = dataReader["SLW_ID"].ToString();
                         text_ElBranOpisID.TextRaw = dataReader["ElBranOpisID"].ToString();
-                        text_opis.TextRaw = dataReader["Nazwa"].ToString() + " / " + dataReader["Opis"].ToString();
+                        text_opis.TextRaw = dataReader["Nazwa"].ToString()/* + " / " + dataReader["Opis"].ToString()*/;
                     }
                 }
                 dataReader.Close();
                 sqlConnection.Close();
-                list.FormatRaw = "20L(1)~Id~|150L(2)~Nazwa~M|300L(2)~Opis~M";
+                /*list.FormatRaw = "20L(1)~Id~|150L(2)~Nazwa~M|300L(2)~Opis~M";*/
+                list.FormatRaw = "150L(2)~Nazwa~M|300L(2)~Opis~M";
                 list.ScrollRaw = "1";
                 list.FromRaw = listaItems;
                 return true;
