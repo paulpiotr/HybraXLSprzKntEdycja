@@ -160,8 +160,7 @@ namespace XLSprzKntEdycja
                         "[CDN].[el_CRMBranzeOpisy]" +
                         "\n" +
                         "WHERE ElBranOpisID=" + Int32.Parse(text_ElBranOpisID.TextRaw.ToString());
-                    string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
-                    SqlConnection sqlConnection = new SqlConnection(connetionString);
+                    SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
                     SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
                     sqlCommand.Connection.Open();
                     sqlCommand.ExecuteNonQuery();
@@ -188,8 +187,7 @@ namespace XLSprzKntEdycja
                     "(branzaID, Opis)" +
                     "\n" +
                     "VALUES(" + Int32.Parse(text_SLW_ID.TextRaw.ToString()) + ", '" + text_opis.TextRaw.ToString() + "')";
-                string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
-                SqlConnection sqlConnection = new SqlConnection(connetionString);
+                SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
                 SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
                 sqlCommand.Connection.Open();
                 sqlCommand.ExecuteNonQuery();
@@ -215,10 +213,9 @@ namespace XLSprzKntEdycja
                     "INNER JOIN CDN.Slowniki sl ON " +
                     "sl.SLW_ID = ec.branzaID " +
                     "WHERE eck.Knt_Karty_GIDNumer=" + Knt_GIDNumer;
-                string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
-                SqlConnection sqlConnection = new SqlConnection(connetionString);
+                SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
+                sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
-                sqlCommand.Connection.Open();
                 SqlDataReader dataReader = sqlCommand.ExecuteReader(CommandBehavior.SingleRow);
                 if (dataReader.Read())
                 {
@@ -244,27 +241,24 @@ namespace XLSprzKntEdycja
                 bool zapiszBranze = ZapiszBranze(ProcID, ControlID, Event);
                 if (!zapiszBranze && KntKarty.Knt_Branza <= 0)
                 {
-                    //MessageBox.Show("Proszę wybrać branżę dla kontrahenta - zakładka Branże Kontrahentów", "Blokada zapisu kartoteki (brak w CRM)", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     return false;
                 }
                 else
                 {
                     Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
                     string sql = "SELECT TOP 1 Knt_Karty_GIDNumer FROM [CDN].[ISK_el_CRMBranzeOpisy_KntKarty] WHERE Knt_Karty_GIDNumer = " + Knt_GIDNumer;
-                    string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
-                    SqlConnection sqlConnection = new SqlConnection(connetionString);
+                    SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
+                    sqlConnection.Open();
                     SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
-                    sqlCommand.Connection.Open();
                     SqlDataReader dataReader = sqlCommand.ExecuteReader(CommandBehavior.SingleRow);
                     if (!zapiszBranze && !dataReader.Read())
                     {
-                        //MessageBox.Show("Proszę wybrać branżę dla kontrahenta - zakładka Branże Kontrahentów", "Blokada zapisu kartoteki (brak w SQL)", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                         dataReader.Close();
-                        sqlCommand.Connection.Close();
+                        sqlConnection.Close();
                         return false;
                     }
                     dataReader.Close();
-                    sqlCommand.Connection.Close();
+                    sqlConnection.Close();
                 }
                 return true;
             }
@@ -312,17 +306,15 @@ namespace XLSprzKntEdycja
                     "(Knt_Karty_GIDNumer, el_CRMBranzeOpisy_ElBranOpisID)" +
                     "\n" +
                     "VALUES(" + Knt_GIDNumer + ", " + ElBranOpisID + ")";
-                string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
-                SqlConnection sqlConnection = new SqlConnection(connetionString);
+                SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
+                sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
-                sqlCommand.Connection.Open();
                 sqlCommand.ExecuteNonQuery();
-                sqlCommand.Connection.Close();
+                sqlConnection.Close();
                 return true;
             }
             catch (Exception e)
             {
-                //MessageBox.Show("Proszę wybrać branżę dla kontrahenta z listy!", "Brak wyboru branży kontrahenta", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 MessageBox.Show("Proszę wybrać branżę w zakładce Branże Kontrahentów! Należy wybrać branżę z listy i kliknć zapisz.", "Blokada zapisu kartoteki (Branże Kontrahentów)", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                 return false;
             }
@@ -351,8 +343,7 @@ namespace XLSprzKntEdycja
                         "ORDER BY s.SLW_ID, s.SLW_WartoscS";
                 string dropcomboItems = "";
                 Int32 k = 0;
-                string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
-                SqlConnection sqlConnection = new SqlConnection(connetionString);
+                SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
                 SqlDataReader dataReader = sqlCommand.ExecuteReader();
@@ -397,8 +388,7 @@ namespace XLSprzKntEdycja
                 string listaItems = "";
                 Int32 j = 0;
                 Int32 k = 0;
-                string connetionString = Runtime.ActiveRuntime.Repository.Connection.ConnectionString.ToString();
-                SqlConnection sqlConnection = new SqlConnection(connetionString);
+                SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
                 sqlConnection.Open();
                 SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
                 SqlDataReader dataReader = sqlCommand.ExecuteReader();
