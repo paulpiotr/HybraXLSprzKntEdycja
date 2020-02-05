@@ -368,6 +368,27 @@ namespace XLSprzKntEdycja
             }
         }
 
+        private bool MessageBoxAskTextRaw(string name)
+        {
+            try
+            {
+                var result = MessageBox.Show(
+                    "Czy ustawić branże: [" + name + "]",
+                    "Ustawianie branży",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+                ;
+                if (result == DialogResult.Yes)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+        }
         private bool ListFromRaw(string text = null, Int32 i = 0)
         {
             try
@@ -405,7 +426,7 @@ namespace XLSprzKntEdycja
                         listaItems = listaItems + /*dataReader["SLW_ID"].ToString() + "|" + */dataReader["Nazwa"].ToString() + "|" + dataReader["Opis"].ToString() + "|";
                     }
                     k = Int32.Parse(dataReader["SLW_ID"].ToString());
-                    if (i > 0 && j == i)
+                    if (i > 0 && j == i && MessageBoxAskTextRaw(dataReader["Nazwa"].ToString()))
                     {
                         text_SLW_ID.TextRaw = dataReader["SLW_ID"].ToString();
                         text_ElBranOpisID.TextRaw = dataReader["ElBranOpisID"].ToString();
@@ -417,6 +438,7 @@ namespace XLSprzKntEdycja
                 /*list.FormatRaw = "20L(1)~Id~|150L(2)~Nazwa~M|300L(2)~Opis~M";*/
                 list.FormatRaw = "150L(2)~Nazwa~M|300L(2)~Opis~M";
                 list.ScrollRaw = "1";
+                list.VScrollRaw = "1";
                 list.FromRaw = listaItems;
                 return true;
             }
