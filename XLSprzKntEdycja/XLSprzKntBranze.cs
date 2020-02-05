@@ -38,7 +38,9 @@ namespace XLSprzKntEdycja
             AddSubscription(false, 0, Events.OpenWindow, new TakeEventDelegate(OnOpenWindow));
         }
 
-        public override void Cleanup() { }
+        public override void Cleanup() {
+            ZaktualizujKarteKontrahenta();
+        }
 
         private bool JustAfterWindowOpening(Procedures ProcID, int ControlID, Events Event)
         {
@@ -199,6 +201,31 @@ namespace XLSprzKntEdycja
             {
                 MessageBox.Show("Błąd: " + e.Message + "\n" + e.StackTrace);
                 return false;
+            }
+        }
+
+        private void ZaktualizujKarteKontrahenta()
+        {
+            try
+            {
+                if (text_SLW_ID.TextRaw.ToString().Length > 0)
+                {
+                    Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
+                    Int32 Knt_Branza = Int32.Parse(text_SLW_ID.TextRaw.ToString());
+                    if (Knt_GIDNumer > 0 && Knt_Branza > 0)
+                    {
+                        string sql = "UPDATE [CDN].[KntKarty] SET Knt_Branza=" + Knt_Branza + " WHERE [Knt_GIDNumer]=" + Knt_GIDNumer;
+                        SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
+                        sqlConnection.Open();
+                        SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
+                        sqlCommand.ExecuteNonQuery();
+                        sqlConnection.Close();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Błąd: " + e.Message + "\n" + e.StackTrace);
             }
         }
 
@@ -420,6 +447,7 @@ namespace XLSprzKntEdycja
                     if (k == Int32.Parse(dataReader["SLW_ID"].ToString()))
                     {
                         listaItems = listaItems + " |" + dataReader["Opis"].ToString() + "|";
+                        //listaItems = listaItems + " | |" + dataReader["Opis"].ToString() + "|";
                     }
                     else
                     {
@@ -431,12 +459,12 @@ namespace XLSprzKntEdycja
                         text_SLW_ID.TextRaw = dataReader["SLW_ID"].ToString();
                         text_ElBranOpisID.TextRaw = dataReader["ElBranOpisID"].ToString();
                         text_opis.TextRaw = dataReader["Nazwa"].ToString()/* + " / " + dataReader["Opis"].ToString()*/;
-                        KntKarty.Knt_Branza = Int32.Parse(text_SLW_ID.TextRaw.ToString());
+                        KntKarty.Knt_Branza = Int32.Parse(dataReader["SLW_ID"].ToString());
                     }
                 }
                 dataReader.Close();
                 sqlConnection.Close();
-                /*list.FormatRaw = "20L(1)~Id~|150L(2)~Nazwa~M|300L(2)~Opis~M";*/
+                //list.FormatRaw = "20L(1)~Id~|150L(2)~Nazwa~M|300L(2)~Opis~M";
                 list.FormatRaw = "150L(2)~Nazwa~M|300L(2)~Opis~M";
                 list.ScrollRaw = "1";
                 list.VScrollRaw = "1";
