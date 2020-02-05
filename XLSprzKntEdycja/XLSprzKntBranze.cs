@@ -424,7 +424,7 @@ namespace XLSprzKntEdycja
                 string sql = "" +
                         "SELECT s.SLW_ID [SLW_ID], s.SLW_WartoscS [Nazwa], o.ElBranOpisID [ElBranOpisID], COALESCE(o.Opis, 'Brak danych')[Opis] " +
                         "FROM [CDN].[el_CRMBranzeOpisy] o " +
-                        "RIGHT JOIN( " +
+                        "INNER JOIN( " +
                             "SELECT * FROM[CDN].[Slowniki] s " +
                             "WHERE s.SLW_Kategoria = 'Branże kontrahentów' AND s.SLW_Aktywny = 1 AND s.SLW_Predefiniowany = 0" +
                         ") s ON s.SLW_ID = o.branzaID" +
