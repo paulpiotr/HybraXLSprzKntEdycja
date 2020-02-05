@@ -431,6 +431,7 @@ namespace XLSprzKntEdycja
                         text_SLW_ID.TextRaw = dataReader["SLW_ID"].ToString();
                         text_ElBranOpisID.TextRaw = dataReader["ElBranOpisID"].ToString();
                         text_opis.TextRaw = dataReader["Nazwa"].ToString()/* + " / " + dataReader["Opis"].ToString()*/;
+                        KntKarty.Knt_Branza = Int32.Parse(text_SLW_ID.TextRaw.ToString());
                     }
                 }
                 dataReader.Close();
