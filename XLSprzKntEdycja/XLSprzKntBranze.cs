@@ -31,15 +31,20 @@ namespace XLSprzKntEdycja
         ClaWindow button_search, button_load, button_save, button_add, button_remove;
         ClaWindow dropcombo, list, item;
         ClaWindow text_SLW_ID, text_ElBranOpisID, text_opis;
+        bool zapis = false;
 
         public override void Init()
         {
+            zapis = false;
             AddSubscription(true, 0, Events.JustAfterWindowOpening, new TakeEventDelegate(JustAfterWindowOpening));
             AddSubscription(false, 0, Events.OpenWindow, new TakeEventDelegate(OnOpenWindow));
         }
 
         public override void Cleanup() {
-            ZaktualizujKarteKontrahenta();
+            if (zapis == true)
+            {
+                ZaktualizujKarteKontrahenta();
+            }
         }
 
         private bool JustAfterWindowOpening(Procedures ProcID, int ControlID, Events Event)
@@ -146,69 +151,11 @@ namespace XLSprzKntEdycja
             return (true);
         }
 
-        private bool UsunOpis(Procedures ProcID, int ControlID, Events Event)
-        {
-            try
-            {
-                var result = MessageBox.Show(
-                    "Usunć " + text_opis.TextRaw.ToString() + " id: " + text_ElBranOpisID.TextRaw.ToString(),
-                    "Usuwanie Opisu",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
-                {
-                    string sql = "" +
-                        "DELETE FROM" +
-                        "\n" +
-                        "[CDN].[el_CRMBranzeOpisy]" +
-                        "\n" +
-                        "WHERE ElBranOpisID=" + Int32.Parse(text_ElBranOpisID.TextRaw.ToString());
-                    SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
-                    SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
-                    sqlCommand.Connection.Open();
-                    sqlCommand.ExecuteNonQuery();
-                    sqlCommand.Connection.Close();
-                }
-                return WyszukajBranze(ProcID, ControlID, Event);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Błąd: " + e.Message + "\n" + e.StackTrace);
-                return false;
-            }
-        }
-
-        private bool DodajOpis(Procedures ProcID, int ControlID, Events Event)
-        {
-            try
-            {
-                string sql = "" +
-                    "INSERT INTO" +
-                    "\n" +
-                    "[CDN].[el_CRMBranzeOpisy]" +
-                    "\n" +
-                    "(branzaID, Opis)" +
-                    "\n" +
-                    "VALUES(" + Int32.Parse(text_SLW_ID.TextRaw.ToString()) + ", '" + text_opis.TextRaw.ToString() + "')";
-                SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
-                SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
-                sqlCommand.Connection.Open();
-                sqlCommand.ExecuteNonQuery();
-                sqlCommand.Connection.Close();
-                return WyszukajBranze(ProcID, ControlID, Event);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Błąd: " + e.Message + "\n" + e.StackTrace);
-                return false;
-            }
-        }
-
         private void ZaktualizujKarteKontrahenta()
         {
             try
             {
-                if (text_SLW_ID.TextRaw.ToString().Length > 0)
+                if (text_SLW_ID.TextRaw != null && text_SLW_ID.TextRaw.ToString().Length > 0)
                 {
                     Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
                     Int32 Knt_Branza = Int32.Parse(text_SLW_ID.TextRaw.ToString());
@@ -225,7 +172,7 @@ namespace XLSprzKntEdycja
             }
             catch (Exception e)
             {
-                MessageBox.Show("Błąd: " + e.Message + "\n" + e.StackTrace);
+                MessageBox.Show("Błąd: " + e.Message);
             }
         }
 
@@ -262,41 +209,6 @@ namespace XLSprzKntEdycja
             }
         }
 
-        private bool SprawdzUstawionaBranza(Procedures ProcID, int ControlID, Events Event)
-        {
-            try
-            {
-                bool zapiszBranze = ZapiszBranze(ProcID, ControlID, Event);
-                if (!zapiszBranze && KntKarty.Knt_Branza <= 0)
-                {
-                    return false;
-                }
-                else
-                {
-                    Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
-                    string sql = "SELECT TOP 1 Knt_Karty_GIDNumer FROM [CDN].[ISK_el_CRMBranzeOpisy_KntKarty] WHERE Knt_Karty_GIDNumer = " + Knt_GIDNumer;
-                    SqlConnection sqlConnection = Runtime.ActiveRuntime.Repository.Connection.CreateCommand().Connection;
-                    sqlConnection.Open();
-                    SqlCommand sqlCommand = new SqlCommand(sql, sqlConnection);
-                    SqlDataReader dataReader = sqlCommand.ExecuteReader(CommandBehavior.SingleRow);
-                    if (!zapiszBranze && !dataReader.Read())
-                    {
-                        dataReader.Close();
-                        sqlConnection.Close();
-                        return false;
-                    }
-                    dataReader.Close();
-                    sqlConnection.Close();
-                }
-                return true;
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Błąd: " + e.Message);
-                return false;
-            }
-        }
-
         private bool WczytajWszystkieBranze(Procedures ProcID, int ControlID, Events Event)
         {
             try
@@ -315,6 +227,7 @@ namespace XLSprzKntEdycja
         {
             try
             {
+                zapis = true;
                 KntKarty.Knt_Branza = Int32.Parse(text_SLW_ID.TextRaw.ToString());
                 Int32 Knt_GIDNumer = Int32.Parse(KntKarty.Knt_GIDNumer.ToString());
                 Int32 ElBranOpisID = Int32.Parse(text_ElBranOpisID.TextRaw.ToString());
@@ -433,7 +346,7 @@ namespace XLSprzKntEdycja
                 {
                     sql += " WHERE s.SLW_WartoscS LIKE '%" + text.ToString() + "%' OR o.Opis LIKE '%" + text.ToString() + "%' ";
                 }
-                sql += " ORDER BY s.SLW_ID, s.SLW_WartoscS, o.ElBranOpisID ";
+                sql += " ORDER BY s.SLW_WartoscS, o.ElBranOpisID ";
                 string listaItems = "";
                 Int32 j = 0;
                 Int32 k = 0;
@@ -459,7 +372,7 @@ namespace XLSprzKntEdycja
                         text_SLW_ID.TextRaw = dataReader["SLW_ID"].ToString();
                         text_ElBranOpisID.TextRaw = dataReader["ElBranOpisID"].ToString();
                         text_opis.TextRaw = dataReader["Nazwa"].ToString()/* + " / " + dataReader["Opis"].ToString()*/;
-                        KntKarty.Knt_Branza = Int32.Parse(dataReader["SLW_ID"].ToString());
+                        //KntKarty.Knt_Branza = Int32.Parse(dataReader["SLW_ID"].ToString());
                     }
                 }
                 dataReader.Close();
